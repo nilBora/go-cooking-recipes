@@ -1,12 +1,12 @@
 package main
+
 import (
-  "log"
-   "net/http"
-   "github.com/pkg/errors"
-   "github.com/go-chi/chi/v5"
-   "github.com/go-chi/chi/v5/middleware"
+   "context"
+   "log"
+   "time"
    "github.com/jessevdk/go-flags"
-   "github.com/jtrw/go-rest"
+   "fmt"
+   server "go-cooking-recipes/v1/app/backend/server"
 )
 
 type Server struct {
@@ -19,7 +19,13 @@ type Server struct {
 
 type Options struct {
     Port string `short:"p" long:"port" env:"SERVER_PORT" default:"8080" description:"Port web server"`
+    PinSize int `long:"pinszie" env:"PIN_SIZE" default:"5" description:"pin size"`
+    MaxExpire time.Duration `long:"expire" env:"MAX_EXPIRE" default:"24h" description:"max lifetime"`
+    MaxPinAttempts int `long:"pinattempts" env:"PIN_ATTEMPTS" default:"3" description:"max attempts to enter pin"`
+    WebRoot string `long:"web" env:"WEB" default:"/" description:"web ui location"`
 }
+
+var revision string
 
 func main() {
     var opts Options
@@ -29,36 +35,17 @@ func main() {
         log.Fatal(err)
     }
 
-    srv := Server {
-        PinSize:   1,
-        WebRoot:   "/",
-        Version:   "1.0",
-        Port: opts.Port,
-    }
+    fmt.Printf("recipe %s\n", revision)
 
-    if err := srv.Run(); err != nil {
+    srv := server.Server{
+        Port:           opts.Port,
+        PinSize:        opts.PinSize,
+        MaxExpire:      opts.MaxExpire,
+        MaxPinAttempts: opts.MaxPinAttempts,
+        WebRoot:        opts.WebRoot,
+        Version:        revision,
+    }
+    if err := srv.Run(context.Background()); err != nil {
         log.Printf("[ERROR] failed, %+v", err)
     }
-}
-
-func (s Server) Run() error {
-    log.Printf("[INFO] Activate rest server")
-    log.Printf("[INFO] Port: %s", s.Port)
-
-	if err := http.ListenAndServe(":"+s.Port, s.routes()); err != http.ErrServerClosed {
-		return errors.Wrap(err, "server failed")
-	}
-
-	return nil
-}
-
-func (s Server) routes() chi.Router {
-	router := chi.NewRouter()
-
-    router.Use(middleware.Logger)
-    router.Use(rest.Ping)
-    router.Route("/", func(r chi.Router) {
-    })
-
-	return router
 }
