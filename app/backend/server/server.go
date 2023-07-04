@@ -65,8 +65,11 @@ func (s Server) routes() chi.Router {
     router.Use(middleware.Logger)
 
 	router.Route("/api/v1", func(r chi.Router) {
-		r.Get("/recipe", s.onListRecipe)
-        r.Post("/recipe", s.onCreateRecipe)
+		r.Get("/recipes", s.onListRecipe)
+		r.Get("/recipes/{uuid}", s.onGetOneRecipe)
+		r.Delete("/recipes/{uuid}", s.onDeleteOneRecipe)
+        r.Post("/recipes", s.onCreateRecipe)
+        r.Post("/recipes/{uuid}", s.onChangeOneRecipe)
 	})
 
 	router.Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +83,18 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
 	 fmt.Fprint(w, "List")
 }
 
+func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
+	 fmt.Fprint(w, "One")
+}
+
+func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
+	 fmt.Fprint(w, "One")
+}
+
 func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
 	 fmt.Fprint(w, "Create")
+}
+
+func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
+	 fmt.Fprint(w, "Change")
 }
