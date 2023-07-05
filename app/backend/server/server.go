@@ -56,7 +56,6 @@ func (s Server) Run(ctx context.Context) error {
 
 func (s Server) routes() chi.Router {
 	router := chi.NewRouter()
-
 	router.Use(middleware.RequestID, middleware.RealIP)
 	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
 	//router.Use(rest.AppInfo("recipe", "Jrtw", s.Version), rest.Ping)
@@ -65,6 +64,7 @@ func (s Server) routes() chi.Router {
     router.Use(middleware.Logger)
 
 	router.Route("/api/v1", func(r chi.Router) {
+	    //r.Use(Authentication)
 		r.Get("/recipes", s.onListRecipe)
 		r.Get("/recipes/{uuid}", s.onGetOneRecipe)
 		r.Delete("/recipes/{uuid}", s.onDeleteOneRecipe)
