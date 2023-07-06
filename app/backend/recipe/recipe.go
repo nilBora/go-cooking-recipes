@@ -5,6 +5,7 @@ import (
 )
 
 type Recipe struct {
+    Uuid        string
     Name        string
 	Description string
 	Text        string

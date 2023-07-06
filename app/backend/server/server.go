@@ -16,7 +16,10 @@ import (
    "fmt"
    "encoding/json"
    recipe "go-cooking-recipes/v1/app/backend/recipe"
+   "github.com/google/uuid"
 )
+
+type JSON map[string]interface{}
 
 type Server struct {
     Port           string
@@ -108,8 +111,10 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
      if err != nil {
         fmt.Println("Error while decoding the data", err.Error())
      }
+     uuid := uuid.New().String()
 
      rec := recipe.Recipe{
+         Uuid: uuid,
          Name: recipeData["name"].(string),
          Description: recipeData["description"].(string),
          Text: recipeData["text"].(string),
@@ -117,6 +122,9 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
          Labels: recipeData["labels"].(string),
      }
      rec.Create()
+
+      render.Status(r, http.StatusCreated)
+      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
 }
 
 func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
