@@ -1,6 +1,7 @@
 package server
 
 import (
+   "io"
    "context"
    "time"
    "log"
@@ -13,6 +14,8 @@ import (
    "github.com/go-chi/render"
    "github.com/jtrw/go-rest"
    "fmt"
+   "encoding/json"
+   recipe "go-cooking-recipes/v1/app/backend/recipe"
 )
 
 type Server struct {
@@ -92,7 +95,28 @@ func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
-	 fmt.Fprint(w, "Create")
+
+    var recipeData map[string]interface{}
+
+    b, err := io.ReadAll(r.Body)
+    if err != nil {
+        fmt.Printf("[ERROR] %s", err)
+    }
+
+    err = json.Unmarshal(b, &recipeData)
+
+     if err != nil {
+        fmt.Println("Error while decoding the data", err.Error())
+     }
+
+     rec := recipe.Recipe{
+         Name: recipeData["name"].(string),
+         Description: recipeData["description"].(string),
+         Text: recipeData["text"].(string),
+         Image: recipeData["image"].(string),
+         Labels: recipeData["labels"].(string),
+     }
+     rec.Create()
 }
 
 func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
