@@ -99,7 +99,7 @@ func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
 
 func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
 
-    var recipeData map[string]interface{}
+    var recipeData JSON
 
     b, err := io.ReadAll(r.Body)
     if err != nil {
@@ -121,10 +121,11 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
          Image: recipeData["image"].(string),
          Labels: recipeData["labels"].(string),
      }
+
      rec.Create()
 
-      render.Status(r, http.StatusCreated)
-      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
+     render.Status(r, http.StatusCreated)
+     render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
 }
 
 func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
