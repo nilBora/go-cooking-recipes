@@ -16,6 +16,7 @@ import (
    "fmt"
    "encoding/json"
    recipe "go-cooking-recipes/v1/app/backend/recipe"
+   "go-cooking-recipes/v1/app/backend/store"
    "github.com/google/uuid"
 )
 
@@ -28,6 +29,8 @@ type Server struct {
 	MaxExpire      time.Duration
 	WebRoot        string
 	Version        string
+	Store          store.Store
+
 }
 
 func (s Server) Run(ctx context.Context) error {
@@ -114,6 +117,7 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
      uuid := uuid.New().String()
 
      rec := recipe.Recipe{
+         Store: s.Store,
          Uuid: uuid,
          Name: recipeData["name"].(string),
          Description: recipeData["description"].(string),
