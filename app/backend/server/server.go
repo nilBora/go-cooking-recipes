@@ -95,7 +95,7 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
     }
     listData := repository.GetList()
 
-    render.JSON(w, r, listData)
+    render.JSON(w, r, JSON{"status": "ok", "data": listData})
 }
 
 func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
@@ -136,8 +136,6 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
      }
 
      repository.Create(rec)
-
-     //rec.Create()
 
      render.Status(r, http.StatusCreated)
      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
