@@ -47,14 +47,11 @@ func (repo Repository) GetList() []Recipe {
 }
 
 func (repo Repository) GetOne(uuid string) Recipe {
+    recipe := Recipe{}
     sql := `SELECT uuid, name, description FROM "recipes" WHERE uuid = ?`
-    row, err := repo.Connection.QueryRow(sql, uuid)
+    err := repo.Connection.QueryRow(sql, uuid).Scan(&recipe.Uuid, &recipe.Name, &recipe.Description)
     if err != nil {
         panic(err)
-    }
-    recipe := Recipe{}
-    if err := row.Scan(&recipe.Uuid, &recipe.Name, &recipe.Description); err != nil {
-        log.Fatalf("could not scan row: %v", err)
     }
 
     return recipe
