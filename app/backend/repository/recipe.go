@@ -4,7 +4,6 @@ import (
     "database/sql"
     "log"
    //"fmt"
-   //"go-cooking-recipes/v1/app/backend/store"
 )
 
 type Repository struct {
@@ -48,9 +47,13 @@ func (repo Repository) GetList() []Recipe {
 
 func (repo Repository) GetOne(uuid string) Recipe {
     recipe := Recipe{}
-    sql := `SELECT uuid, name, description FROM "recipes" WHERE uuid = ?`
-    err := repo.Connection.QueryRow(sql, uuid).Scan(&recipe.Uuid, &recipe.Name, &recipe.Description)
-    if err != nil {
+
+    sql := `SELECT uuid, name, description FROM "recipes" WHERE uuid = $1`
+    row := repo.Connection.QueryRow(sql, uuid)
+
+    err := row.Scan(&recipe.Uuid, &recipe.Name, &recipe.Description)
+
+    if err != nil{
         panic(err)
     }
 
