@@ -99,7 +99,15 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
-	 fmt.Fprint(w, "One")
+    repository := recipe.Repository{
+        Connection: s.Store.Connection,
+    }
+
+    uuid := chi.URLParam(r, "uuid")
+    log.Printf("[INFO] UUID: %s", uuid)
+    row := repository.GetOne(uuid)
+
+    render.JSON(w, r, JSON{"status": "ok", "data": row})
 }
 
 func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
