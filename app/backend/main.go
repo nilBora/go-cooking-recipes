@@ -7,7 +7,7 @@ import (
    "github.com/jessevdk/go-flags"
    "fmt"
    server "go-cooking-recipes/v1/app/backend/server"
-   store "go-cooking-recipes/v1/app/backend/store"
+   "go-cooking-recipes/v1/app/backend/repository"
    "github.com/joho/godotenv"
    _ "github.com/lib/pq"
 )
@@ -43,7 +43,7 @@ func main() {
     }
 
     fmt.Printf("recipe %s\n", revision)
-    s := store.ConnectDB()
+    repo := repository.ConnectDB()
 
     srv := server.Server{
         Port:           opts.Port,
@@ -52,7 +52,7 @@ func main() {
         MaxPinAttempts: opts.MaxPinAttempts,
         WebRoot:        opts.WebRoot,
         Version:        revision,
-        Store:          s,
+        Repository:     repo,
     }
     if err := srv.Run(context.Background()); err != nil {
         log.Printf("[ERROR] failed, %+v", err)

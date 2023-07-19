@@ -15,9 +15,8 @@ import (
    "github.com/jtrw/go-rest"
    "fmt"
    "encoding/json"
-   //recipe "go-cooking-recipes/v1/app/backend/recipe"
    recipe "go-cooking-recipes/v1/app/backend/repository"
-   "go-cooking-recipes/v1/app/backend/store"
+   repository "go-cooking-recipes/v1/app/backend/repository"
    "github.com/google/uuid"
 )
 
@@ -30,7 +29,7 @@ type Server struct {
 	MaxExpire      time.Duration
 	WebRoot        string
 	Version        string
-	Store          store.Store
+	Repository     repository.Repository
 
 }
 
@@ -90,22 +89,15 @@ func (s Server) routes() chi.Router {
 }
 
 func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
-    repository := recipe.Repository{
-        Connection: s.Store.Connection,
-    }
-    listData := repository.GetList()
+    listData := s.Repository.GetList()
 
     render.JSON(w, r, JSON{"status": "ok", "data": listData})
 }
 
 func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
-    repository := recipe.Repository{
-        Connection: s.Store.Connection,
-    }
-
     uuid := chi.URLParam(r, "uuid")
     log.Printf("[INFO] UUID: %s", uuid)
-    row := repository.GetOne(uuid)
+    row := s.Repository.GetOne(uuid)
 
     render.JSON(w, r, JSON{"status": "ok", "data": row})
 }
@@ -130,10 +122,6 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
      }
      uuid := uuid.New().String()
 
-     repository := recipe.Repository{
-        Connection: s.Store.Connection,
-     }
-
      rec := recipe.Recipe{
          Uuid: uuid,
          Name: recipeData["name"].(string),
@@ -143,7 +131,7 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
          Labels: recipeData["labels"].(string),
      }
 
-     repository.Create(rec)
+     s.Repository.Create(rec)
 
      render.Status(r, http.StatusCreated)
      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})

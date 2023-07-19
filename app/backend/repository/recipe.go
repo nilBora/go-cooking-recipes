@@ -1,14 +1,10 @@
 package repository
 
 import (
-    "database/sql"
+   // "database/sql"
     "log"
    //"fmt"
 )
-
-type Repository struct {
-    Connection  *sql.DB
-}
 
 type Recipe struct {
     Uuid        string
