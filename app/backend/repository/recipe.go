@@ -1,8 +1,9 @@
 package repository
 
 import (
-   // "database/sql"
+    //"database/sql"
     "log"
+    "errors"
    //"fmt"
 )
 
@@ -41,7 +42,7 @@ func (repo Repository) GetList() []Recipe {
     return recipes
 }
 
-func (repo Repository) GetOne(uuid string) Recipe {
+func (repo Repository) GetOne(uuid string) (Recipe, error) {
     recipe := Recipe{}
 
     sql := `SELECT uuid, name, description FROM "recipes" WHERE uuid = $1`
@@ -49,9 +50,22 @@ func (repo Repository) GetOne(uuid string) Recipe {
 
     err := row.Scan(&recipe.Uuid, &recipe.Name, &recipe.Description)
 
-    if err != nil{
-        panic(err)
+    if err != nil {
+        return recipe, errors.New("Row Not Found")
     }
 
-    return recipe
+    return recipe, nil
+}
+
+func (repo Repository) Remove(uuid string) (error) {
+    sql := `DELETE FROM "recipes" WHERE uuid = $1`
+    _, err := repo.Connection.Exec(sql, uuid)
+
+    if err != nil {
+        return errors.New("Can't delete row")
+    }
+
+    //count, err := res.RowsAffected()
+
+    return nil
 }

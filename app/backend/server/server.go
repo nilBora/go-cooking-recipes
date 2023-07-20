@@ -96,14 +96,29 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
 
 func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
     uuid := chi.URLParam(r, "uuid")
-    log.Printf("[INFO] UUID: %s", uuid)
-    row := s.Repository.GetOne(uuid)
+
+    row, err := s.Repository.GetOne(uuid)
+
+    if err != nil {
+         render.Status(r, http.StatusNotFound)
+         render.JSON(w, r, JSON{"status": "error"})
+         return
+    }
 
     render.JSON(w, r, JSON{"status": "ok", "data": row})
 }
 
 func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
-	 fmt.Fprint(w, "One")
+    uuid := chi.URLParam(r, "uuid")
+
+    err := s.Repository.Remove(uuid)
+    if err != nil {
+         render.Status(r, http.StatusNotFound)
+         render.JSON(w, r, JSON{"status": "error"})
+         return
+    }
+    render.Status(r, http.StatusNoContent)
+    render.JSON(w, r, JSON{"status": "deleted"})
 }
 
 func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
