@@ -89,7 +89,13 @@ func (s Server) routes() chi.Router {
 }
 
 func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
-    listData := s.Repository.GetList()
+    listData, err := s.Repository.GetList()
+
+    if err != nil {
+         render.Status(r, http.StatusNotFound)
+         render.JSON(w, r, JSON{"status": "error"})
+         return
+    }
 
     render.JSON(w, r, JSON{"status": "ok", "data": listData})
 }
@@ -146,7 +152,11 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
          Labels: recipeData["labels"].(string),
      }
 
-     s.Repository.Create(rec)
+     err = s.Repository.Create(rec)
+     if err != nil {
+        render.Status(r, http.StatusBadRequest)
+        render.JSON(w, r, JSON{"status": "error", "message": err})
+     }
 
      render.Status(r, http.StatusCreated)
      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
