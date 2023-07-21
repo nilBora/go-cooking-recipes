@@ -16,21 +16,26 @@ type Recipe struct {
 	Labels      string
 }
 
-func (repo Repository) Create(r Recipe) {
+func (repo Repository) Create(r Recipe) error {
      sql := `INSERT INTO "recipes"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
      _, err := repo.Connection.Exec(sql, r.Uuid, r.Name, r.Description, r.Text)
      if err != nil {
-        panic(err)
+        return errors.New("Couldn't create recipe")
      }
+
+     return nil
 }
 
-func (repo Repository) GetList() []Recipe {
+func (repo Repository) GetList() ([]Recipe, error) {
     sql := `SELECT uuid, name, description FROM "recipes"`
     rows, err := repo.Connection.Query(sql)
-    if err != nil {
-        panic(err)
-    }
+
     recipes := []Recipe{}
+
+    if err != nil {
+        return recipes, errors.New("Rows Not Found")
+    }
+
     for rows.Next() {
         recipe := Recipe{}
         if err := rows.Scan(&recipe.Uuid, &recipe.Name, &recipe.Description); err != nil {
@@ -39,7 +44,7 @@ func (repo Repository) GetList() []Recipe {
 
         recipes = append(recipes, recipe)
     }
-    return recipes
+    return recipes, nil
 }
 
 func (repo Repository) GetOne(uuid string) (Recipe, error) {
