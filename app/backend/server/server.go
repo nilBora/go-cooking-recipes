@@ -89,6 +89,11 @@ func (s Server) routes() chi.Router {
 }
 
 func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
+
+    limit := r.URL.Query().Get("limit")
+    offset := r.URL.Query().Get("offset")
+    order := r.URL.Query().Get("order")
+
     listData, err := s.Repository.GetList()
 
     if err != nil {
