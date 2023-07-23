@@ -16,6 +16,12 @@ type Recipe struct {
 	Labels      string
 }
 
+type ListParams struct {
+    Limit string
+    Offset int
+    Order string
+}
+
 func (repo Repository) Create(r Recipe) error {
      sql := `INSERT INTO "recipes"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
      _, err := repo.Connection.Exec(sql, r.Uuid, r.Name, r.Description, r.Text)
@@ -26,7 +32,7 @@ func (repo Repository) Create(r Recipe) error {
      return nil
 }
 
-func (repo Repository) GetList() ([]Recipe, error) {
+func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
     sql := `SELECT uuid, name, description FROM "recipes"`
     rows, err := repo.Connection.Query(sql)
 
