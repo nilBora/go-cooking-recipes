@@ -18,6 +18,7 @@ import (
    recipe "go-cooking-recipes/v1/app/backend/repository"
    repository "go-cooking-recipes/v1/app/backend/repository"
    "github.com/google/uuid"
+   "strconv"
 )
 
 type JSON map[string]interface{}
@@ -89,8 +90,8 @@ func (s Server) routes() chi.Router {
 }
 
 func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
-    limit := r.URL.Query().Get("limit")
-    offset := r.URL.Query().Get("offset")
+    limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+    offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
     order := r.URL.Query().Get("order")
 
      param := recipe.ListParams{

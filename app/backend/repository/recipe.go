@@ -4,7 +4,8 @@ import (
     //"database/sql"
     "log"
     "errors"
-   //"fmt"
+   "fmt"
+   "strconv"
 )
 
 type Recipe struct {
@@ -17,7 +18,7 @@ type Recipe struct {
 }
 
 type ListParams struct {
-    Limit string
+    Limit int
     Offset int
     Order string
 }
@@ -34,6 +35,14 @@ func (repo Repository) Create(r Recipe) error {
 
 func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
     sql := `SELECT uuid, name, description FROM "recipes"`
+
+    if params.Limit > 0 {
+        sql = sql + ` LIMIT ` + strconv.Itoa(params.Limit)
+    }
+
+    fmt.Println(params.Limit)
+    fmt.Println(sql)
+
     rows, err := repo.Connection.Query(sql)
 
     recipes := []Recipe{}
