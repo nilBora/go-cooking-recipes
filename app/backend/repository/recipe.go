@@ -21,6 +21,8 @@ type ListParams struct {
     Limit int
     Offset int
     Order string
+    Page int
+    Size int
 }
 
 func (repo Repository) Create(r Recipe) error {
@@ -36,8 +38,11 @@ func (repo Repository) Create(r Recipe) error {
 func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
     sql := `SELECT uuid, name, description FROM "recipes"`
 
+    limit := params.Limit
+    offset := params.Limit * (params.Page - 1)
+
     if params.Limit > 0 {
-        sql = sql + ` LIMIT ` + strconv.Itoa(params.Limit)
+        sql = sql + ` LIMIT ` + strconv.Itoa(limit) + ` OFFSET ` + strconv.Itoa(offset)
     }
 
     fmt.Println(params.Limit)
