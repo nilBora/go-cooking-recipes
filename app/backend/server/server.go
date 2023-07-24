@@ -91,13 +91,13 @@ func (s Server) routes() chi.Router {
 
 func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
     limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-    offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
     order := r.URL.Query().Get("order")
+    page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 
-     param := recipe.ListParams{
+    param := recipe.ListParams{
         Limit: limit,
-        Offset: offset,
         Order: order,
+        Page: page,
      }
 
     listData, err := s.Repository.GetList(param)
