@@ -45,9 +45,6 @@ func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
         sql = sql + ` LIMIT ` + strconv.Itoa(limit) + ` OFFSET ` + strconv.Itoa(offset)
     }
 
-    fmt.Println(params.Limit)
-    fmt.Println(sql)
-
     rows, err := repo.Connection.Query(sql)
 
     recipes := []Recipe{}
@@ -93,4 +90,8 @@ func (repo Repository) Remove(uuid string) (error) {
     //count, err := res.RowsAffected()
 
     return nil
+}
+
+func (repo Repository) Change(uuid string, r Recipe) (error) {
+
 }
