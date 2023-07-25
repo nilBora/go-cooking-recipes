@@ -174,5 +174,35 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
-	 fmt.Fprint(w, "Change")
+    uuid := chi.URLParam(r, "uuid")
+
+    var recipeData JSON
+
+    b, err := io.ReadAll(r.Body)
+    if err != nil {
+        fmt.Printf("[ERROR] %s", err)
+    }
+
+    err = json.Unmarshal(b, &recipeData)
+
+     if err != nil {
+        fmt.Println("Error while decoding the data", err.Error())
+     }
+
+     rec := recipe.Recipe{
+         Name: recipeData["name"].(string),
+         Description: recipeData["description"].(string),
+         Text: recipeData["text"].(string),
+         Image: recipeData["image"].(string),
+         Labels: recipeData["labels"].(string),
+     }
+
+     err = s.Repository.Change(uuid, rec)
+     if err != nil {
+        render.Status(r, http.StatusBadRequest)
+        render.JSON(w, r, JSON{"status": "error", "message": err})
+     }
+
+     render.Status(r, http.StatusCreated)
+     render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
 }
