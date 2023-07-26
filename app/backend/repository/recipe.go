@@ -1,12 +1,24 @@
 package repository
 
 import (
-    //"database/sql"
+   // "database/sql"
     "log"
     "errors"
-   "fmt"
+  // "fmt"
    "strconv"
 )
+
+type RecipeRepository interface {
+    Create(r Recipe) error
+    GetList(params ListParams) ([]Recipe, error)
+    GetOne(uuid string) (Recipe, error)
+    Remove(uuid string) (error)
+    Change(uuid string, r Recipe) (error)
+}
+
+// type RecipeRepository struct {
+//     Connection  *sql.DB
+// }
 
 type Recipe struct {
     Uuid        string
@@ -93,5 +105,5 @@ func (repo Repository) Remove(uuid string) (error) {
 }
 
 func (repo Repository) Change(uuid string, r Recipe) (error) {
-
+    return nil
 }
