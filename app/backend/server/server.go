@@ -99,8 +99,8 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
         Order: order,
         Page: page,
      }
-
-    listData, err := s.Repository.GetList(param)
+    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
+    listData, err := recipeRepository.GetList(param)
 
     if err != nil {
          render.Status(r, http.StatusNotFound)
@@ -114,7 +114,8 @@ func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
 func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
     uuid := chi.URLParam(r, "uuid")
 
-    row, err := s.Repository.GetOne(uuid)
+    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
+    row, err := recipeRepository.GetOne(uuid)
 
     if err != nil {
          render.Status(r, http.StatusNotFound)
@@ -128,7 +129,8 @@ func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
 func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
     uuid := chi.URLParam(r, "uuid")
 
-    err := s.Repository.Remove(uuid)
+    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
+    err := recipeRepository.Remove(uuid)
     if err != nil {
          render.Status(r, http.StatusNotFound)
          render.JSON(w, r, JSON{"status": "error"})
@@ -162,8 +164,8 @@ func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
          Image: recipeData["image"].(string),
          Labels: recipeData["labels"].(string),
      }
-
-     err = s.Repository.Create(rec)
+     recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
+     err = recipeRepository.Create(rec)
      if err != nil {
         render.Status(r, http.StatusBadRequest)
         render.JSON(w, r, JSON{"status": "error", "message": err})
@@ -196,8 +198,8 @@ func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
          Image: recipeData["image"].(string),
          Labels: recipeData["labels"].(string),
      }
-
-     err = s.Repository.Change(uuid, rec)
+     recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
+     err = recipeRepository.Change(uuid, rec)
      if err != nil {
         render.Status(r, http.StatusBadRequest)
         render.JSON(w, r, JSON{"status": "error", "message": err})

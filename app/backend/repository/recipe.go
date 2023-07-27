@@ -1,24 +1,24 @@
 package repository
 
 import (
-   // "database/sql"
+    "database/sql"
     "log"
     "errors"
   // "fmt"
    "strconv"
 )
 
-type RecipeRepository interface {
-    Create(r Recipe) error
-    GetList(params ListParams) ([]Recipe, error)
-    GetOne(uuid string) (Recipe, error)
-    Remove(uuid string) (error)
-    Change(uuid string, r Recipe) (error)
-}
-
-// type RecipeRepository struct {
-//     Connection  *sql.DB
+// type IRecipeRepository interface {
+//     Create(r Recipe) error
+//     GetList(params ListParams) ([]Recipe, error)
+//     GetOne(uuid string) (Recipe, error)
+//     Remove(uuid string) (error)
+//     Change(uuid string, r Recipe) (error)
 // }
+
+type RecipeRepository struct {
+    Connection  *sql.DB
+}
 
 type Recipe struct {
     Uuid        string
@@ -37,7 +37,13 @@ type ListParams struct {
     Size int
 }
 
-func (repo Repository) Create(r Recipe) error {
+func NewRecipeRepository(conn *sql.DB) *RecipeRepository {
+	return &RecipeRepository{
+		Connection: conn,
+	}
+}
+
+func (repo RecipeRepository) Create(r Recipe) error {
      sql := `INSERT INTO "recipes"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
      _, err := repo.Connection.Exec(sql, r.Uuid, r.Name, r.Description, r.Text)
      if err != nil {
@@ -47,7 +53,7 @@ func (repo Repository) Create(r Recipe) error {
      return nil
 }
 
-func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
+func (repo RecipeRepository) GetList(params ListParams) ([]Recipe, error) {
     sql := `SELECT uuid, name, description FROM "recipes"`
 
     limit := params.Limit
@@ -76,7 +82,7 @@ func (repo Repository) GetList(params ListParams) ([]Recipe, error) {
     return recipes, nil
 }
 
-func (repo Repository) GetOne(uuid string) (Recipe, error) {
+func (repo RecipeRepository) GetOne(uuid string) (Recipe, error) {
     recipe := Recipe{}
 
     sql := `SELECT uuid, name, description FROM "recipes" WHERE uuid = $1`
@@ -91,7 +97,7 @@ func (repo Repository) GetOne(uuid string) (Recipe, error) {
     return recipe, nil
 }
 
-func (repo Repository) Remove(uuid string) (error) {
+func (repo RecipeRepository) Remove(uuid string) (error) {
     sql := `DELETE FROM "recipes" WHERE uuid = $1`
     _, err := repo.Connection.Exec(sql, uuid)
 
@@ -104,6 +110,6 @@ func (repo Repository) Remove(uuid string) (error) {
     return nil
 }
 
-func (repo Repository) Change(uuid string, r Recipe) (error) {
+func (repo RecipeRepository) Change(uuid string, r Recipe) (error) {
     return nil
 }
