@@ -110,6 +110,17 @@ func (repo RecipeRepository) Remove(uuid string) (error) {
     return nil
 }
 
-func (repo RecipeRepository) Change(uuid string, r Recipe) (error) {
-    return nil
+func (repo RecipeRepository) Change(uuid string, r Recipe) (int64, error) {
+    sql := `UPDATE "recipes" SET name = $1, description = $2, text = $3 WHERE uuid = $4`
+    res, err := repo.Connection.Exec(sql, r.Name, r.Description, r.Text, uuid)
+    if err != nil {
+        return 0, errors.New("Can't update row")
+    }
+    count, err := res.RowsAffected()
+
+    if err != nil {
+        return 0, err
+    }
+
+    return count, nil
 }

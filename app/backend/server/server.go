@@ -199,12 +199,12 @@ func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
          Labels: recipeData["labels"].(string),
      }
      recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-     err = recipeRepository.Change(uuid, rec)
+     _, err = recipeRepository.Change(uuid, rec)
      if err != nil {
         render.Status(r, http.StatusBadRequest)
         render.JSON(w, r, JSON{"status": "error", "message": err})
      }
 
-     render.Status(r, http.StatusCreated)
+     render.Status(r, http.StatusOK)
      render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
 }
