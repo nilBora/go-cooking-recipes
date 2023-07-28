@@ -1,7 +1,6 @@
 package server
 
 import (
-   "io"
    "context"
    "time"
    "log"
@@ -13,15 +12,9 @@ import (
    "github.com/go-chi/chi/v5/middleware"
    "github.com/go-chi/render"
    "github.com/jtrw/go-rest"
-   "fmt"
-   "encoding/json"
-   recipe "go-cooking-recipes/v1/app/backend/repository"
    repository "go-cooking-recipes/v1/app/backend/repository"
-   "github.com/google/uuid"
-   "strconv"
+   recipe_handler "go-cooking-recipes/v1/app/backend/handler"
 )
-
-type JSON map[string]interface{}
 
 type Server struct {
     Port           string
@@ -72,14 +65,14 @@ func (s Server) routes() chi.Router {
 	router.Use(rest.Ping)
 	router.Use(tollbooth_chi.LimitHandler(tollbooth.NewLimiter(10, nil)))
     router.Use(middleware.Logger)
-
+    handler := recipe_handler.NewHandler(s.Repository.Connection)
 	router.Route("/api/v1", func(r chi.Router) {
 	    //r.Use(Authentication)
-		r.Get("/recipes", s.onListRecipe)
-		r.Get("/recipes/{uuid}", s.onGetOneRecipe)
-		r.Delete("/recipes/{uuid}", s.onDeleteOneRecipe)
-        r.Post("/recipes", s.onCreateRecipe)
-        r.Post("/recipes/{uuid}", s.onChangeOneRecipe)
+		r.Get("/recipes", handler.OnListRecipe)
+		r.Get("/recipes/{uuid}", handler.OnGetOneRecipe)
+		r.Delete("/recipes/{uuid}", handler.OnDeleteOneRecipe)
+        r.Post("/recipes", handler.OnCreateRecipe)
+        r.Post("/recipes/{uuid}", handler.OnChangeOneRecipe)
 	})
 
 	router.Get("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
@@ -87,124 +80,4 @@ func (s Server) routes() chi.Router {
 	})
 
 	return router
-}
-
-func (s Server) onListRecipe(w http.ResponseWriter, r *http.Request) {
-    limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-    order := r.URL.Query().Get("order")
-    page, _ := strconv.Atoi(r.URL.Query().Get("page"))
-
-    param := recipe.ListParams{
-        Limit: limit,
-        Order: order,
-        Page: page,
-     }
-    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-    listData, err := recipeRepository.GetList(param)
-
-    if err != nil {
-         render.Status(r, http.StatusNotFound)
-         render.JSON(w, r, JSON{"status": "error"})
-         return
-    }
-
-    render.JSON(w, r, JSON{"status": "ok", "data": listData})
-}
-
-func (s Server) onGetOneRecipe(w http.ResponseWriter, r *http.Request) {
-    uuid := chi.URLParam(r, "uuid")
-
-    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-    row, err := recipeRepository.GetOne(uuid)
-
-    if err != nil {
-         render.Status(r, http.StatusNotFound)
-         render.JSON(w, r, JSON{"status": "error"})
-         return
-    }
-
-    render.JSON(w, r, JSON{"status": "ok", "data": row})
-}
-
-func (s Server) onDeleteOneRecipe(w http.ResponseWriter, r *http.Request) {
-    uuid := chi.URLParam(r, "uuid")
-
-    recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-    err := recipeRepository.Remove(uuid)
-    if err != nil {
-         render.Status(r, http.StatusNotFound)
-         render.JSON(w, r, JSON{"status": "error"})
-         return
-    }
-    render.Status(r, http.StatusNoContent)
-    render.JSON(w, r, JSON{"status": "deleted"})
-}
-
-func (s Server) onCreateRecipe(w http.ResponseWriter, r *http.Request) {
-
-    var recipeData JSON
-
-    b, err := io.ReadAll(r.Body)
-    if err != nil {
-        fmt.Printf("[ERROR] %s", err)
-    }
-
-    err = json.Unmarshal(b, &recipeData)
-
-     if err != nil {
-        fmt.Println("Error while decoding the data", err.Error())
-     }
-     uuid := uuid.New().String()
-
-     rec := recipe.Recipe{
-         Uuid: uuid,
-         Name: recipeData["name"].(string),
-         Description: recipeData["description"].(string),
-         Text: recipeData["text"].(string),
-         Image: recipeData["image"].(string),
-         Labels: recipeData["labels"].(string),
-     }
-     recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-     err = recipeRepository.Create(rec)
-     if err != nil {
-        render.Status(r, http.StatusBadRequest)
-        render.JSON(w, r, JSON{"status": "error", "message": err})
-     }
-
-     render.Status(r, http.StatusCreated)
-     render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
-}
-
-func (s Server) onChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
-    uuid := chi.URLParam(r, "uuid")
-
-    var recipeData JSON
-
-    b, err := io.ReadAll(r.Body)
-    if err != nil {
-        fmt.Printf("[ERROR] %s", err)
-    }
-
-    err = json.Unmarshal(b, &recipeData)
-
-     if err != nil {
-        fmt.Println("Error while decoding the data", err.Error())
-     }
-
-     rec := recipe.Recipe{
-         Name: recipeData["name"].(string),
-         Description: recipeData["description"].(string),
-         Text: recipeData["text"].(string),
-         Image: recipeData["image"].(string),
-         Labels: recipeData["labels"].(string),
-     }
-     recipeRepository := recipe.NewRecipeRepository(s.Repository.Connection)
-     _, err = recipeRepository.Change(uuid, rec)
-     if err != nil {
-        render.Status(r, http.StatusBadRequest)
-        render.JSON(w, r, JSON{"status": "error", "message": err})
-     }
-
-     render.Status(r, http.StatusOK)
-     render.JSON(w, r, JSON{"status": "ok", "uuid": uuid})
 }
