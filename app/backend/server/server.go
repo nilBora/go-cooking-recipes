@@ -68,6 +68,7 @@ func (s Server) routes() chi.Router {
     handler := recipe_handler.NewHandler(s.Repository.Connection)
 	router.Route("/api/v1", func(r chi.Router) {
 	    //r.Use(Authentication)
+	    r.Use(Cors)
 		r.Get("/recipes", handler.OnListRecipe)
 		r.Get("/recipes/{uuid}", handler.OnGetOneRecipe)
 		r.Delete("/recipes/{uuid}", handler.OnDeleteOneRecipe)
