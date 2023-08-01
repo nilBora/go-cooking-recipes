@@ -20,14 +20,17 @@ func Authentication(next http.Handler) http.Handler {
 }
 
 func Cors(next http.Handler) http.Handler {
-    fn := func(w http.ResponseWriter, r *http.Request) {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*") // change this later
+        w.Header().Set("Access-Control-Allow-Credentials", "true")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, Api-Token, HX-Request, HX-Current-URL")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+
         if r.Method == "OPTIONS" {
-            w.Header().Set("Access-Control-Allow-Origin", "*")
-            w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-            w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Api-Token, HX-Request, HX-Current-URL")
+            w.WriteHeader(http.StatusNoContent)
             return
         }
+
         next.ServeHTTP(w, r)
-    }
-    return http.HandlerFunc(fn)
+    })
 }
