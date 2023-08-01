@@ -70,20 +70,25 @@
         <!-- Список елементів рецептів -->
         <div class="col-md-9">
             <h2>Список рецептів</h2>
-            <div class="list-group" hx-get="http://127.0.0.1:8080/api/v1/recipes">
-                <div class="list-group-item" hx-swap="outerHTML" hx-trigger="load" hx-vars="data">
+            <div class="list-group" hx-get="http://127.0.0.1:8080/api/v1/recipes" hx-sel="data" hx-headers="Content-Type: application/json">
+                <!-- Використовуємо атрибут hx-ext="repeat" для динамічного повторення list-group-item -->
+                <div class="list-group-item" hx-ext="repeat" hx-vars="recipe">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1" hx-text="data.Name">Назва страви</h5>
-                        <small hx-text="image">Image</small>
+                        <!-- Використовуємо атрибут hx-text для вставки тексту з JSON -->
+                        <h5 class="mb-1" hx-text="recipe.Name">Назва страви</h5>
+                        <small hx-text="recipe.Image">Image</small>
                     </div>
-                    <p class="mb-1" hx-text="description">Опис страви</p>
-                    <small class="ingredient-tag" hx-ext="repeat" hx-swap="outerHTML" hx-trigger="load">
-                        <span hx-text="ingredient">asd</span>
-                    </small>
+                    <!-- Використовуємо атрибут hx-text для вставки тексту з JSON -->
+                    <p class="mb-1" hx-text="recipe.Description">Опис страви</p>
+                    <!-- Використовуємо атрибут hx-ext="repeat" для динамічного списку інгредієнтів -->
+                    <div hx-ext="repeat" hx-vars="ingredient" hx-sel="recipe.Labels.split(',')">
+                        <span class="ingredient-tag" hx-text="ingredient.trim()">Інгредієнт</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>
