@@ -20,13 +20,14 @@ type RecipeRepository struct {
     Connection  *sql.DB
 }
 
+
 type Recipe struct {
     Uuid        string
     Name        string
 	Description string
 	Text        string
     Image       string
-	Labels      string
+	Labels      []string
 }
 
 type ListParams struct {

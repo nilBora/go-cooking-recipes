@@ -91,13 +91,19 @@ func (h Handler) OnCreateRecipe(w http.ResponseWriter, r *http.Request) {
      }
      uuid := uuid.New().String()
 
+     labels := recipeData["labels"].(map[string]interface{})
+     var labelsArray []string
+     for _, v := range labels {
+        labelsArray = append(labelsArray, v.(string))
+     }
+
      rec := recipe.Recipe{
          Uuid: uuid,
          Name: recipeData["name"].(string),
          Description: recipeData["description"].(string),
          Text: recipeData["text"].(string),
          Image: recipeData["image"].(string),
-         Labels: recipeData["labels"].(string),
+         Labels: labelsArray,
      }
      recipeRepository := recipe.NewRecipeRepository(h.Connection)
      err = recipeRepository.Create(rec)
@@ -126,12 +132,18 @@ func (h Handler) OnChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
         fmt.Println("Error while decoding the data", err.Error())
      }
 
+    labels := recipeData["labels"].(map[string]interface{})
+    var labelsArray []string
+    for _, v := range labels {
+        labelsArray = append(labelsArray, v.(string))
+    }
+
      rec := recipe.Recipe{
          Name: recipeData["name"].(string),
          Description: recipeData["description"].(string),
          Text: recipeData["text"].(string),
          Image: recipeData["image"].(string),
-         Labels: recipeData["labels"].(string),
+         Labels: labelsArray,
      }
      recipeRepository := recipe.NewRecipeRepository(h.Connection)
      _, err = recipeRepository.Change(uuid, rec)
