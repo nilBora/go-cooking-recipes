@@ -77,7 +77,7 @@ func (repo RecipeRepository) GetList(params ListParams) ([]Recipe, error) {
         if err := rows.Scan(&recipe.Uuid, &recipe.Name, &recipe.Description); err != nil {
             log.Fatalf("could not scan row: %v", err)
         }
-
+        recipe.Labels = []string{"test", "test2"}
         recipes = append(recipes, recipe)
     }
     return recipes, nil
