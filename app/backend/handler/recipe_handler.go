@@ -110,6 +110,7 @@ func (h Handler) OnCreateRecipe(w http.ResponseWriter, r *http.Request) {
      if err != nil {
         render.Status(r, http.StatusBadRequest)
         render.JSON(w, r, JSON{"status": "error", "message": err})
+        return
      }
 
      render.Status(r, http.StatusCreated)
@@ -150,6 +151,7 @@ func (h Handler) OnChangeOneRecipe(w http.ResponseWriter, r *http.Request) {
      if err != nil {
         render.Status(r, http.StatusBadRequest)
         render.JSON(w, r, JSON{"status": "error", "message": err})
+        return
      }
 
      render.Status(r, http.StatusOK)
