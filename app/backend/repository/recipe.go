@@ -8,13 +8,19 @@ import (
    "strconv"
 )
 
-// type IRecipeRepository interface {
-//     Create(r Recipe) error
-//     GetList(params ListParams) ([]Recipe, error)
-//     GetOne(uuid string) (Recipe, error)
-//     Remove(uuid string) (error)
-//     Change(uuid string, r Recipe) (error)
-// }
+type RecipeRepositoryInterface interface {
+    Create(r Recipe) error
+    GetList(params ListParams) ([]Recipe, error)
+    GetOne(uuid string) (Recipe, error)
+    Remove(uuid string) (error)
+    Change(uuid string, r Recipe) (error)
+}
+
+func NewRecipeRepository(conn *sql.DB) RecipeRepositoryInterface {
+	return &RecipeRepository{
+		Connection: conn,
+	}
+}
 
 type RecipeRepository struct {
     Connection  *sql.DB
