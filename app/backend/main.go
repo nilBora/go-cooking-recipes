@@ -10,6 +10,7 @@ import (
    "go-cooking-recipes/v1/app/backend/repository"
    "github.com/joho/godotenv"
    _ "github.com/lib/pq"
+   "os"
 )
 
 type Server struct {
@@ -32,13 +33,7 @@ type Options struct {
 var revision string
 
 func main() {
-    if opts.Dsn == "" {
-        if err := godotenv.Load(); err != nil {
-            panic("No .env file found")
-        }
-    } else {
-        os.Setenv("POSTGRES_DSN", opts.Dsn)
-    }
+    fmt.Printf("recipe %s\n", revision)
 
     var opts Options
     parser := flags.NewParser(&opts, flags.Default)
@@ -47,7 +42,13 @@ func main() {
         log.Fatal(err)
     }
 
-    fmt.Printf("recipe %s\n", revision)
+    if opts.Dsn == "" {
+        if err := godotenv.Load(); err != nil {
+            panic("No .env file found")
+        }
+    } else {
+        os.Setenv("POSTGRES_DSN", opts.Dsn)
+    }
     repo := repository.ConnectDB()
 
     srv := server.Server{
