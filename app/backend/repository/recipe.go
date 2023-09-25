@@ -13,7 +13,7 @@ type RecipeRepositoryInterface interface {
     GetList(params ListParams) ([]Recipe, error)
     GetOne(uuid string) (Recipe, error)
     Remove(uuid string) (error)
-    Change(uuid string, r Recipe) (error)
+    Change(uuid string, r Recipe) (int64, error)
 }
 
 func NewRecipeRepository(conn *sql.DB) RecipeRepositoryInterface {
@@ -44,11 +44,11 @@ type ListParams struct {
     Size int
 }
 
-func NewRecipeRepository(conn *sql.DB) *RecipeRepository {
-	return &RecipeRepository{
-		Connection: conn,
-	}
-}
+// func NewRecipeRepository(conn *sql.DB) *RecipeRepository {
+// 	return &RecipeRepository{
+// 		Connection: conn,
+// 	}
+// }
 
 func (repo RecipeRepository) Create(r Recipe) error {
      sql := `INSERT INTO "recipes"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
