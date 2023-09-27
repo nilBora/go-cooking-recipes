@@ -17,6 +17,7 @@ type JSON map[string]interface{}
 
 type Handler struct {
     Connection *sql.DB
+    RecipeRepository repository.RecipeRepositoryInterface
 }
 
 func NewHandler(conn *sql.DB) Handler {
