@@ -34,14 +34,6 @@ type Category struct {
     Image       string
 }
 
-type ListParams struct {
-    Limit int
-    Offset int
-    Order string
-    Page int
-    Size int
-}
-
 func (repo CategoryRepository) Create(c Category) error {
      sql := `INSERT INTO "categories"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
 
@@ -68,7 +60,7 @@ func (repo CategoryRepository) GetList(params ListParams) ([]Category, error) {
     categories := []Category{}
 
     if err != nil {
-        return category, errors.New("Rows Not Found")
+        return categories, errors.New("Rows Not Found")
     }
 
     for rows.Next() {
