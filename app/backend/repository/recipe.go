@@ -36,14 +36,6 @@ type Recipe struct {
 	Labels      []string
 }
 
-type ListParams struct {
-    Limit int
-    Offset int
-    Order string
-    Page int
-    Size int
-}
-
 // func NewRecipeRepository(conn *sql.DB) *RecipeRepository {
 // 	return &RecipeRepository{
 // 		Connection: conn,
