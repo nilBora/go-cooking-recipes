@@ -104,8 +104,85 @@
             <div class="list-group" id="recipe-list">
             </div>
         </div>
+
+        <div class="container mt-4">
+            <h2>Додати новий рецепт</h2>
+            <form id="recipe-form">
+                <div class="form-group">
+                    <label for="recipe-name">Назва страви</label>
+                    <input type="text" class="form-control" id="recipe-name" placeholder="Введіть назву рецепту" required>
+                </div>
+                <div class="form-group">
+                    <label for="recipe-description">Description</label>
+                    <textarea class="form-control" id="recipe-description" rows="3" placeholder="Введіть опис рецепту" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="recipe-text">Опис страви</label>
+                    <textarea class="form-control" id="recipe-text" rows="3" placeholder="Введіть опис рецепту" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="recipe-image">Посилання на зображення</label>
+                    <input type="text" class="form-control" id="recipe-image" placeholder="Вставте посилання на зображення рецепту">
+                </div>
+                <div class="form-group">
+                    <label for="recipe-ingredients">Інгредієнти (розділяйте комами)</label>
+                    <input type="text" class="form-control" id="recipe-ingredients" placeholder="Введіть інгредієнти, розділяючи комами">
+                </div>
+                <button type="submit" class="btn btn-primary">Додати рецепт</button>
+            </form>
+        </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const recipeForm = document.getElementById('recipe-form');
+
+        recipeForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting in the default way
+
+            // Collect form data
+            const name = document.getElementById('recipe-name').value;
+            const description = document.getElementById('recipe-description').value;
+            const text = document.getElementById('recipe-text').value;
+            const image = document.getElementById('recipe-image').value;
+            const ingredients = document.getElementById('recipe-ingredients').value.split(',');
+
+            // Create a JSON object with the form data
+            const newRecipe = {
+                name: name,
+                description: description,
+                text: text,
+                image: image,
+                labels: ingredients.map(ingredient => ingredient.trim()), // Clean up and split ingredients
+            };
+
+            // Send a POST request to your server's API endpoint
+            fetch('http://127.0.0.1:8080/api/v1/recipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newRecipe),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // If the server responds with a successful status
+                        alert('Рецепт успішно додано!');
+                        // Optionally, you can reset the form after successful submission
+                        recipeForm.reset();
+                    } else {
+                        alert('Помилка при додаванні рецепту. Будь ласка, спробуйте ще раз.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Помилка при відправці запиту:', error);
+                    alert('Помилка при додаванні рецепту. Будь ласка, спробуйте ще раз.');
+                });
+        });
+    });
+</script>
+
 <script>
     function getRecipes() {
         fetch('http://127.0.0.1:8080/api/v1/recipes')
