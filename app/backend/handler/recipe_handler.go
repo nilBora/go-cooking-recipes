@@ -91,9 +91,11 @@ func (h Handler) OnCreateRecipe(w http.ResponseWriter, r *http.Request) {
         fmt.Println("Error while decoding the data", err.Error())
      }
      uuid := uuid.New().String()
-     labels := recipeData["labels"].(map[string]interface{})
+     //labels := recipeData["labels"].(map[string]interface{})
+     labels := recipeData["labels"].(interface{})
+     fmt.Println(labels)
      var labelsArray []string
-     for _, v := range labels {
+     for _, v := range labels.([]interface{}) {
         labelsArray = append(labelsArray, v.(string))
      }
 
