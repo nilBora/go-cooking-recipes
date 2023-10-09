@@ -36,12 +36,6 @@ type Recipe struct {
 	Labels      []string
 }
 
-// func NewRecipeRepository(conn *sql.DB) *RecipeRepository {
-// 	return &RecipeRepository{
-// 		Connection: conn,
-// 	}
-// }
-
 func (repo RecipeRepository) Create(r Recipe) error {
      sql := `INSERT INTO "recipes"("uuid", "name", "description", "text") VALUES($1, $2, $3, $4)`
      _, err := repo.Connection.Exec(sql, r.Uuid, r.Name, r.Description, r.Text)
